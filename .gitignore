@@ -1,4 +1,6 @@
 .idea
 venv/
 token/
+output files/
 *.bak
+Msg-History.xlsx
