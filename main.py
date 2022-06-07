@@ -10,11 +10,14 @@ from bs4 import BeautifulSoup
 import requests
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import *
+import sys
 
 TOKEN = open("token/token.txt", "r").read()
+ADMIN_ID = int(open("token/admin_id.txt", "r").read())
+
 
 #let's add these
-# - put the token in a seperate file
+# - put the token in a seperate file --> done
 # - use threading used in project excel/whats
 # - asking questions like skills and posting time
 # - auto correct the words using a library
@@ -46,11 +49,11 @@ def echo(update, context):
     for i in range(1):
         update.message.reply_text(update.message.text,  reply_to_message_id=update.message.message_id)
 
-    if update.message.chat.id != 1074890834:
+    if update.message.chat.id != ADMIN_ID:
         print(00)
         theMsg = f"{name} - @{update.message.chat.username} :\n{update.message.text}"
         print(1)
-        context.bot.send_message('1074890834',theMsg)
+        context.bot.send_message(ADMIN_ID,theMsg)
         print(11)
 
 
@@ -70,6 +73,15 @@ def error(update, context):
     """Log Errors caused by Updates."""
     logger.warning('Update "%s" caused error "%s"', update, context.error)
     logger.warning(context.error)
+
+def exitBot(update, context):
+    """To exit the bot"""
+    if update.message.chat.id == ADMIN_ID:
+        print("exit")
+        update.message.reply_text("bot exited successfully",  reply_to_message_id=update.message.message_id)
+        sys.exit(0)
+    else:
+        update.message.reply_text("Can't exit bot! you aren't admin",  reply_to_message_id=update.message.message_id)
 
 def FindJob(name_,user):
     wb = Workbook()
@@ -181,6 +193,7 @@ def main():
     dp = updater.dispatcher
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
+    dp.add_handler(CommandHandler("exit", exitBot))
     dp.add_handler(MessageHandler(Filters.text, echo))
     dp.add_error_handler(error)
     updater.start_polling()
